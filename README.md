@@ -9,7 +9,7 @@ Please install carla refering to [Carla Installation](doc/Carla_installation.md)
 
 Please install python dependencies by
 ```bash
-conda create -n skylink_v2x python=3.12.9
+conda create -n skylink_v2x python=3.7
 conda activate skylink_v2x
 python -n pip install -r requirements.txt
 python setup.py develop # 
