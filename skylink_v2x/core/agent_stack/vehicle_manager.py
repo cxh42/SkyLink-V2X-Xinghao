@@ -185,16 +185,54 @@ class VehicleManager(DynamicManager):
     
     def remove(self) -> None:
         """
-        Clean up resources associated with this vehicle manager.
-        
-        Invokes cleanup routines on all integrated modules.
+        清理资源，添加异常处理
         """
-        print(f"VehicleManager {self.agent_id}: cleaning up resources")
-        # TODO: Implement remove() method for all modules.
-        self.perception_manager.destroy()  # Assumes remove() method exists.
-        self.map_manager.remove()
-        self.localizer.remove()
-        self.vehicle.destroy()
+        print(f"{self.__class__.__name__} {self.agent_id}: cleaning up resources")
         
+        # 清理感知管理器
+        try:
+            if hasattr(self, 'perception_manager') and self.perception_manager:
+                self.perception_manager.destroy()
+        except Exception as e:
+            print(f"清理感知管理器失败: {str(e)}")
+        
+        # 清理地图管理器
+        try:
+            if hasattr(self, 'map_manager') and self.map_manager:
+                if hasattr(self.map_manager, 'remove'):
+                    self.map_manager.remove()
+                else:
+                    # 尝试手动清理地图资源
+                    if hasattr(self.map_manager, '_map_surface'):
+                        self.map_manager._map_surface = None
+        except Exception as e:
+            print(f"清理地图管理器失败: {str(e)}")
+        
+        # 清理定位管理器
+        try:
+            if hasattr(self, 'localizer') and self.localizer:
+                if hasattr(self.localizer, 'remove'):
+                    self.localizer.remove()
+                else:
+                    print(f"定位管理器没有remove方法")
+        except Exception as e:
+            print(f"清理定位管理器失败: {str(e)}")
+        
+        # 清理车辆/无人机
+        try:
+            if hasattr(self, 'vehicle') and self.vehicle:
+                self.vehicle.destroy()
+        except Exception as e:
+            print(f"清理车辆失败: {str(e)}")
+        
+        # 如果是无人机还需要清理AirSim资源
+        if hasattr(self, 'airsim_client') and hasattr(self, 'drone_name'):
+            try:
+                self.airsim_client.landAsync(vehicle_name=self.drone_name).join()
+                self.airsim_client.armDisarm(False, vehicle_name=self.drone_name)
+                self.airsim_client.enableApiControl(False, vehicle_name=self.drone_name)
+            except Exception as e:
+                print(f"清理AirSim资源失败: {str(e)}")
+            
 
 

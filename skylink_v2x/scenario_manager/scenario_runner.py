@@ -54,60 +54,63 @@ def run_scenario(opt, scenario_params):
         #                       current_time=scenario_params['current_time'])
 
         spectator = scenario_manager.carla_world.get_spectator()
+
+        # 在无限循环之前添加计数器
+        frame_count = 0
+
         # run steps
         while True:
-            scenario_manager.tick()
-            # Since a scene always have a vehicle, we can use the first one as the ego vehicle
-            if 'cav1' not in agent_dict:
-                raise ValueError("The first vehicle must be cav1 for correctly spawn the spectator.")
-            transform = agent_dict['cav1'].vehicle.get_transform()
-            spectator.set_transform(carla.Transform(
-                transform.location +
-                carla.Location(
-                    z=70),
-                carla.Rotation(
-                    pitch=-
-                    90)))
-            
-            # The following commented code is for ego vehicle visualization. Consider removing it or move it somewhere else.
-            # spectator.set_transform(carla.Transform(
-            #     transform.location +
-            #     carla.Location(
-            #         x=-3,
-            #         y=-5,
-            #         z=4),
-            #     carla.Rotation(
-            #         yaw=65,
-            #         pitch=-
-            #         30)))
-            
-            # spectator.set_transform(carla.Transform(
-            #     transform.location +
-            #     carla.Location(
-            #         x=0,
-            #         y=-5,
-            #         z=1.3),
-            #     carla.Rotation(
-            #         yaw=90,
-            #         pitch=-
-            #         0)))
+            try:
+                scenario_manager.tick()
+                scenario_manager.run_step()
+                
+                # 周期性检查内存
+                frame_count += 1
+                if frame_count % 100 == 0:
+                    # 如果有psutil库，可以添加内存监控
+                    pass
+                    
+            except KeyboardInterrupt:
+                print('用户终止程序')
+                break
+            except Exception as e:
+                print(f"运行时发生错误: {e}")
+                break
 
-            # for i, single_cav in enumerate(agent_dict):
-            #     single_cav.update_info()
-            #     control = single_cav.run_step()
-            #     single_cav.vehicle.apply_control(control)
-            scenario_manager.run_step()
-
+    except Exception as e:
+        print(f"主循环外发生错误: {e}")
     finally:
-        # eval_manager.evaluate() # TODO: Implement evaluation later
-
+        print("清理资源中...")
+        
+        # 停止录制（如果启用）
         if opt.record:
-            scenario_manager.client.stop_recorder()
+            try:
+                scenario_manager.client.stop_recorder()
+            except:
+                pass
 
-        scenario_manager.close()
+        # 安全关闭场景管理器
+        try:
+            scenario_manager.close()
+        except Exception as e:
+            print(f"关闭场景管理器时出错: {e}")
 
+        # 安全移除所有代理
         for v in agent_dict.values():
-            v.remove()
+            try:
+                v.remove()
+            except Exception as e:
+                print(f"移除代理时出错: {e}")
+                
         agent_dict.clear()
+        
+        # 安全移除背景车辆
         for v in bg_veh_list:
-            v.remove()
+            try:
+                v.remove()
+            except:
+                pass
+                
+        # 强制垃圾回收
+        import gc
+        gc.collect()

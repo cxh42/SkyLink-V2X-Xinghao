@@ -751,3 +751,23 @@ class MapManager:
     def destroy(self):
         """Clean up resources."""
         cv2.destroyAllWindows()
+
+    def remove(self):
+        """
+        清理地图管理器资源
+        """
+        # 清理地图表面
+        if hasattr(self, '_map_surface'):
+            self._map_surface = None
+        
+        # 清理缓存的路径点
+        if hasattr(self, '_waypoints_buffer'):
+            self._waypoints_buffer.clear()
+        
+        # 清理缓存的规划路径
+        if hasattr(self, '_path_buffer'):
+            self._path_buffer.clear()
+        
+        # 清理其他可能的大型数据结构
+        if hasattr(self, '_dynamic_objects'):
+            self._dynamic_objects.clear()

@@ -77,6 +77,7 @@ class ScenarioManager:
                  xodr_path=None,
                  cav_world=None):
         
+        self.timestamp = 0
         town = scenario_params['world']['town']
         self.scenario_params = scenario_params
         self.carla_version = carla_version
@@ -526,6 +527,12 @@ class ScenarioManager:
         
         self.carla_world.tick()
         
+        # 每50帧执行一次垃圾回收
+        if self.timestamp % 50 == 0:  # 使用self.timestamp而不是self._timestamp
+            import gc
+            gc.collect()
+            
+        self.timestamp += 1  # 更新计数器
         
         
     def sync_drone_pos(self):
@@ -581,7 +588,31 @@ class ScenarioManager:
 
     def close(self):
         """
-        Simulation close.
+        关闭仿真环境，清理资源
         """
-        # restore to origin setting
-        self.carla_world.apply_settings(self.origin_settings)
+        # 清理AirSim资源
+        try:
+            # 关闭所有无人机
+            self.airsim_client.armDisarm(False)
+            self.airsim_client.enableApiControl(False)
+            self.airsim_client.reset()
+        except:
+            pass
+        
+        # 清理通信管理器
+        try:
+            if hasattr(self, 'comm_manager'):
+                if hasattr(self.comm_manager, 'clear_resources'):
+                    self.comm_manager.clear_resources()
+        except:
+            pass
+        
+        # 恢复原始设置
+        try:
+            self.carla_world.apply_settings(self.origin_settings)
+        except:
+            pass
+        
+        # 强制垃圾回收
+        import gc
+        gc.collect()

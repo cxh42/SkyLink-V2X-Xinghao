@@ -3,7 +3,8 @@ import weakref
 import carla
 import numpy as np
 from datetime import datetime
-from copy import deepcopy
+import gc  # 导入垃圾回收模块
+from copy import deepcopy, copy
 from skylink_v2x.core.communication_manager.attacker import (
     PerceptionAttacker, LocalizationAttacker, MappingAttacker, 
     PlanningAttacker, ControlAttacker
@@ -25,12 +26,15 @@ class CommAgentHelper:
         self._velocity = velocity
         self._comm_range = comm_range
         
+        # 减小数据缓冲区大小，从默认的100减少到10
+        data_buffer_size = getattr(comm_config, 'data_buffer_size', 10)
+        
         # Recent data transmissions with a configurable maximum size to simulate latency
-        self._history_perception = deque(maxlen=getattr(comm_config, 'data_buffer_size', 100))
-        self._history_localization = deque(maxlen=getattr(comm_config, 'data_buffer_size', 100))
-        self._history_mapping = deque(maxlen=getattr(comm_config, 'data_buffer_size', 100))
-        self._history_planning = deque(maxlen=getattr(comm_config, 'data_buffer_size', 100))
-        self._history_control = deque(maxlen=getattr(comm_config, 'data_buffer_size', 100))
+        self._history_perception = deque(maxlen=data_buffer_size)
+        self._history_localization = deque(maxlen=data_buffer_size)
+        self._history_mapping = deque(maxlen=data_buffer_size)
+        self._history_planning = deque(maxlen=data_buffer_size)
+        self._history_control = deque(maxlen=data_buffer_size)
         
         # Data buffer to store the most recent data. It is used for synchronization of all agents.
         self._perception_buffer = None
@@ -104,6 +108,22 @@ class CommAgentHelper:
         
     def buffer_control(self, data):
         self._control_buffer = data
+    
+    def clear_resources(self):
+        """清理资源，释放内存"""
+        # 清空所有缓冲区
+        self._history_perception.clear()
+        self._history_localization.clear()
+        self._history_mapping.clear()
+        self._history_planning.clear()
+        self._history_control.clear()
+        
+        # 删除当前的缓冲数据
+        self._perception_buffer = None
+        self._localization_buffer = None
+        self._mapping_buffer = None
+        self._planning_buffer = None
+        self._control_buffer = None
 
 
 class CommunicationManager:
@@ -158,23 +178,37 @@ class CommunicationManager:
                                                              comm_range=agent_manager.get_comm_range(),
                                                              agent_type=agent_manager.type)
 
-    def buffer_perception(self,agent_id, data):
+    def buffer_perception(self, agent_id, data):
         # TODO: deepcopy is not enabled (RuntimeError: Pickling of "carla.libcarla.Vehicle" instances is not enabled (http://www.boost.org/libs/python/doc/v2/pickle.html))
         self._comm_agent_helpers[agent_id].buffer_perception(data)
     
-    def buffer_localization(self,agent_id, data):
+    def buffer_localization(self, agent_id, data):
         # TODO: deepcopy is not enabled (RuntimeError: Pickling of "carla.libcarla.Transform" instances is not enabled (http://www.boost.org/libs/python/doc/v2/pickle.html))
         self._comm_agent_helpers[agent_id].buffer_localization(data)
         
-    def buffer_mapping(self,agent_id, data):
-        self._comm_agent_helpers[agent_id].buffer_mapping(deepcopy(data))
+    def buffer_mapping(self, agent_id, data):
+        # 避免对大型数据结构使用深拷贝，这可能会占用大量内存
+        # 如果数据有自己的浅拷贝方法，尽量使用
+        if hasattr(data, 'copy') and callable(getattr(data, 'copy')):
+            copied_data = data.copy()
+        else:
+            # 对于不能修改的情况，仍保留deepcopy以维持功能
+            copied_data = deepcopy(data)
+            
+        self._comm_agent_helpers[agent_id].buffer_mapping(copied_data)
         
-    def buffer_planning(self,agent_id, data):
+    def buffer_planning(self, agent_id, data):
         # TODO: deepcopy is not enabled (RuntimeError: Pickling of "carla.libcarla.VehicleControl" instances is not enabled (http://www.boost.org/libs/python/doc/v2/pickle.html))
         self._comm_agent_helpers[agent_id].buffer_planning(data)
         
-    def buffer_control(self,agent_id, data):
-        self._comm_agent_helpers[agent_id].buffer_control(deepcopy(data))
+    def buffer_control(self, agent_id, data):
+        # 使用和mapping数据相同的逻辑
+        if hasattr(data, 'copy') and callable(getattr(data, 'copy')):
+            copied_data = data.copy()
+        else:
+            copied_data = deepcopy(data)
+            
+        self._comm_agent_helpers[agent_id].buffer_control(copied_data)
         
     def sync_perception(self):
         for agent_id in self._connected_agents.keys():
@@ -263,17 +297,63 @@ class CommunicationManager:
         detected_objects = agent_comm_helper.get_perception_data()[-1]['detected_objects']
         self._data_logger.save_objects(detected_objects=detected_objects)
     
+    def clean_agent_history(self, max_history=2):
+        """
+        保留最近的历史数据，清理旧数据
+        """
+        for agent_id in self._comm_agent_helpers:
+            agent_helper = self._comm_agent_helpers[agent_id]
+            
+            # 只保留最近的max_history条历史数据
+            if len(agent_helper._history_perception) > max_history:
+                while len(agent_helper._history_perception) > max_history:
+                    agent_helper._history_perception.popleft()
+                    
+            if len(agent_helper._history_localization) > max_history:
+                while len(agent_helper._history_localization) > max_history:
+                    agent_helper._history_localization.popleft()
+                    
+            if len(agent_helper._history_mapping) > max_history:
+                while len(agent_helper._history_mapping) > max_history:
+                    agent_helper._history_mapping.popleft()
+                    
+            if len(agent_helper._history_planning) > max_history:
+                while len(agent_helper._history_planning) > max_history:
+                    agent_helper._history_planning.popleft()
+                    
+            if len(agent_helper._history_control) > max_history:
+                while len(agent_helper._history_control) > max_history:
+                    agent_helper._history_control.popleft()
+    
+    def clear_resources(self):
+        """清理所有资源，释放内存"""
+        for agent_id in list(self._comm_agent_helpers.keys()):
+            if hasattr(self._comm_agent_helpers[agent_id], 'clear_resources'):
+                self._comm_agent_helpers[agent_id].clear_resources()
         
+        self._comm_agent_helpers.clear()
+        self._connected_agents.clear()
+        
+        # 清除其他引用
+        if hasattr(self, '_data_logger'):
+            del self._data_logger
 
     def tick(self):
         """
-        Simulates the communication manager for a single time step.
+        模拟通信管理器一个时间步。
         """
         if self._log_data:
             self.log_data()
             
+        # 每10个时间步清理一次历史数据
+        if self._timestamp % 10 == 0:
+            self.clean_agent_history()
+            
+        # 每30个时间步执行一次垃圾回收
+        if self._timestamp % 30 == 0:
+            gc.collect()
+            
         self._timestamp += 1
-        
+    
     def get_timestamp(self):
         return self._timestamp
-    
