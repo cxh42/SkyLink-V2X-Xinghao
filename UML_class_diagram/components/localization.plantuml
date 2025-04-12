@@ -1,0 +1,90 @@
+package skylink_v2x.autonomy_stack.core.localization {
+	package localization_manager {
+		abstract class LocalizationManager {
+			+vehicle
+			+activate
+			+map
+			+geo_ref
+			+_ego_pos
+			+_speed
+			+_ego_pos_history
+			+_timestamp_history
+			+gnss
+		}
+
+		abstract class DynamicLocalizationManager Extends LocalizationManager {
+			+imu
+			+heading_noise_std
+			+speed_noise_std
+			+dt
+			+kf
+			+debug_helper
+		}
+
+		class VehicleLocalizationManager Extends DynamicLocalizationManager {
+    }
+
+    class DroneLocalizationManager Extends DynamicLocalizationManager {
+    }
+
+		class RSU_LocalizationManager Extends LocalizationManager {
+			+true_ego_pos
+			+_speed
+		}
+	}
+
+	package localization_sensor {
+		class GnssSensor {
+			+sensor
+			+lat
+			+lon
+			+alt
+			+timestamp
+		}
+		class ImuSensor {
+			+sensor
+			+gyroscope
+		}
+	}
+  
+
+
+	package debug_helper {
+		class LocDebugHelper {
+			+show_animation
+			+x_scale
+			+y_scale
+			+gnss_x
+			+gnss_y
+			+gnss_yaw
+			+gnss_spd
+			+filter_x
+			+filter_y
+			+filter_yaw
+			+filter_spd
+			+gt_x
+			+gt_y
+			+gt_yaw
+			+gt_spd
+			+hxEst
+			+hTrue
+			+hz
+			+actor_id
+		}
+	}
+
+	package kalman_filter {
+		class KalmanFilter {
+			+Q
+			+R
+			+time_step
+			+xEst
+			+PEst
+		}
+	}
+
+	LocalizationManager *-- localization_sensor.GnssSensor
+	DynamicLocalizationManager *-- localization_sensor.ImuSensor
+	DynamicLocalizationManager *-- debug_helper.LocDebugHelper
+	LocalizationManager *-- kalman_filter.KalmanFilter
+}

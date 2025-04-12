@@ -1,0 +1,37 @@
+package skylink_v2x.autonomy_stack.core.control {
+  package  control_manager {
+    abstract class ControlManager {
+      +controller
+    }
+
+    class VehicleControlManager Extends ControlManager {
+    }
+
+    class DroneControlManager Extends ControlManager {
+    }
+
+    class RSUControlManager Extends ControlManager {
+    }
+  }
+  package pid_controller {
+    class Controller {
+      +max_brake
+      +max_throttle
+      +_lon_k_p
+      +_lon_k_d
+      +_lon_k_i
+      +_lon_ebuffer
+      +max_steering
+      +_lat_k_p
+      +_lat_k_d
+      +_lat_k_i
+      +_lat_ebuffer
+      +dt
+      +current_transform
+      +current_speed
+      +past_steering
+      +dynamic
+    }
+  }
+  control_manager.ControlManager *-- pid_controller.Controller
+}

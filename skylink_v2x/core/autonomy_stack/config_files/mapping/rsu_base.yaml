@@ -1,0 +1,5 @@
+pixel_size: 0.25 # rasterization map resolution
+resolution: [512, 512] # the rasterize map size (pixel)    
+# Map range = resolution * pixel_size = 128m * 128m
+lane_seg_size: 0.1 # for every 0.1m, we draw a point of lane
+map_types: ['seg'] # 'seg', 'vector'

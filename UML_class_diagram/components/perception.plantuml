@@ -1,0 +1,103 @@
+package skylink_v2x.autonomy_stack.core.perception {
+  package perception_manager {
+    abstract class PerceptionManager {
+      +vehicle
+      +carla_world
+      +_map
+      +id
+      +activate
+      +camera_visualize
+      +camera_num
+      +lidar_visualize
+      +global_position
+      +cav_world
+      +ml_manager
+      +rgb_camera
+      +lidar
+      +o3d_vis
+      +data_dump
+      +semantic_lidar
+      +count
+      +ego_pos
+      +objects
+      +traffic_thresh
+    }
+
+    class VehiclePerceptionManager Extends PerceptionManager {
+    }
+
+    class DronePerceptionManager Extends PerceptionManager {
+    }
+
+    class RSUPerceptionManager Extends PerceptionManager {
+    }
+
+
+    class PerceptionSensor{
+      +sensor
+      +timestamp
+      +frame
+    }
+    class CameraSensor Extends PerceptionSensor {
+      +image
+      +image_width
+      +image_height
+    }
+    class LidarSensor Extends PerceptionSensor {
+      +data
+      +o3d_pointcloud
+    }
+    class SemanticLidarSensor Extends PerceptionSensor {
+      +points
+      +obj_idx
+      +obj_tag
+      +o3d_pointcloud
+    }
+  }
+  package obstacle {
+    class Obstacle {
+      +bounding_box
+      +o3d_bbx
+    }
+    class BoundingBox {
+      +location
+      +extent
+    }
+    Obstacle -- BoundingBox
+  }
+
+  package dynamic_obstacle {
+    class DynamicObstacle Extends skylink_v2x.autonomy_stack.core.perception.obstacle.Obstacle {
+      +location
+      +transform
+      +velocity
+    }
+    class VehicleObstacle Extends DynamicObstacle {
+      +carla_id
+    }
+    class DroneObstacle Extends DynamicObstacle {
+      +carla_id?
+    }
+  }
+
+
+  package static_obstacle {
+    class StaticObstacle Extends skylink_v2x.autonomy_stack.core.perception.obstacle.Obstacle {
+    }
+    class TrafficLight {
+      -_location
+      +state
+      +actor
+    }
+  }
+  
+
+  perception_manager.PerceptionManager *-- perception_manager.CameraSensor
+  perception_manager.PerceptionManager *-- perception_manager.LidarSensor
+  perception_manager.PerceptionManager *-- perception_manager.SemanticLidarSensor
+
+  dynamic_obstacle.VehicleObstacle *-- dynamic_obstacle.BoundingBox
+
+  static_obstacle.StaticObstacle *-- static_obstacle.BoundingBox
+}
+

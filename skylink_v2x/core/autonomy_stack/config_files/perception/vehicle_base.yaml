@@ -1,0 +1,54 @@
+sensors:
+  camera:
+    - name: "front_camera"
+      fov: 110.0
+      resolution: [1280, 720]  # [image_size_x, image_size_y]
+      pos: [2.5, 0.0, 0.5, 0, 0, 0]
+    - name: "front_left_camera"
+      fov: 110.0
+      resolution: [1280, 720]
+      pos: [0.2, -0.7, 1.2, 0, -60.0, 0]
+    - name: "front_right_camera"
+      fov: 110.0
+      resolution: [1280, 720]
+      pos: [0.3, 0.7, 1.2, 0, 60.0, 0]
+    - name: "rear_camera"
+      fov: 110.0
+      resolution: [1280, 720]
+      pos: [-2.4, 0.0, 0.5, 0, 180, 0]
+    - name: "rear_left_camera"
+      fov: 110.0
+      resolution: [1280, 720]
+      pos: [-0.6, -0.7, 1.2, 0, -120, 0]
+    - name: "rear_right_camera"
+      fov: 110.0
+      resolution: [1280, 720]
+      pos: [-0.6, 0.7, 1.2, 0, 120, 0]
+  lidar:
+    - name: "lidar"
+      pos: [-0.5, 0, 1.4, 0, 0, 0]
+      channels: 32
+      range: 50
+      points_per_second: 100000
+      rotation_frequency: 20  # the simulation is 20 fps
+      upper_fov: 10.0
+      lower_fov: -38.0
+      dropoff_general_rate: 0.0
+      dropoff_intensity_limit: 1.0
+      dropoff_zero_intensity: 0.0
+      noise_stddev: 0.0
+  semantic_lidar:
+    - name: "semantic_lidar"
+      pos: [-0.5, 0, 1.6, 0, 0, 0]
+      channels: 32
+      range: 50
+      points_per_second: 100000
+      rotation_frequency: 20  # the simulation is 20 fps
+      upper_fov: 10.0
+      lower_fov: -30.0
+      dropoff_general_rate: 0.0
+      dropoff_intensity_limit: 1.0
+      dropoff_zero_intensity: 0.0
+      noise_stddev: 0.0
+detection: "gt"
+detection_model_config: null

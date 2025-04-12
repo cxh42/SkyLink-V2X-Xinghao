@@ -1,0 +1,235 @@
+@startuml complete_skylink_v2x_with_relations
+
+top to bottom direction
+
+skinparam dpi 150
+skinparam shadowing false
+skinparam roundcorner 30
+skinparam defaultTextAlignment center
+
+skinparam Padding 2
+skinparam Margin 2
+skinparam ArrowThickness 2
+skinparam classAttributeIconSize 0
+skinparam linetype curved 
+skinparam linetype ortho
+
+skinparam sequence {
+    ArrowColor red
+    ActorBorderColor red
+    ActorFontSize 12
+    LifeLineBorderColor #0055AA
+    LifeLineBackgroundColor #EAF2FF
+    ParticipantBackgroundColor #F5F5F5
+    ParticipantBorderColor #0055AA
+    ParticipantFontSize 14
+}
+
+skinparam class {
+    BackgroundColor #F5F5F5
+    BorderColor #0055AA
+    FontSize 14
+}
+
+
+' !include components/perception.plantuml
+' !include components/localization.plantuml
+' !include components/mapping.plantuml
+' !include components/planning.plantuml
+' !include components/control.plantuml
+' !include components/simulation.plantuml
+' !include components/safety.plantuml
+
+
+
+package skylink_v2x.core.agent_stack {
+    class SimScenario {
+      -agent_managers: dict
+        ' -dynamic_managers: dict
+            ' -vehicle_managers: set
+            ' -drone_managers: set
+            ' -ego_vehicle_manager_id: str
+            ' -platooning_dict: dict
+        ' -static_managers: dict
+            ' -rsu_manager_dict: dict
+      -ml_manager: MLManager
+      -global_clock: int
+      -sumo2carla_ids: dict
+      -dumper: DataLogger
+      +remove()
+      +update_agent_manager(agent_managers:dict)
+      +update_sumo_vehicles(sumo2carla_ids:dict)
+      +get_agent_managers(): dict
+      +locate_agent_manager(loc): object
+      +get_ego_vehicle_manager(): object
+      +tick()
+    }
+
+    class AgentManager <<abstract>> {
+      -id: str
+      -perception_manager: PerceptionManager
+      -data_dumper: DataLogger
+      -v2x_manager: V2XManager
+      +update()
+      +run()
+      +remove()
+    }
+
+    class DataLogger {
+      -agent_id: str
+      -rgb_camera: list
+      -lidar: LidarManager
+      -save_folder: str
+      -count: int
+      -yaml_file: dict
+      +update(perception_manager, localization_manager, planner)
+      +save()
+      -save_rgb_image(count)
+      -save_lidar_points()
+      -update_ego_vehicle()
+      -update_other_vehicles()
+      -update_rsus()
+      -update_drones()
+    }
+
+    class DynamicManager <<abstract>> Extends AgentManager {
+      -localizer: LocalizationManager
+      -sim_map: carla.Map
+      ' or skylink.Map
+      -dynamic_agent: carla.Vehicle 
+      ' or skylink.Drone
+      -map_manager: MappingManager
+      +set_destination(start_location, end_location, clean, end_reset)
+    }
+
+    class VehicleManager Extends DynamicManager {
+      -perception_manager: PerceptionManager
+      -safety_manager: SafetyManager
+      -planner: PlanningManager
+      -controller: ControlManager
+    }
+
+    class DroneManager Extends DynamicManager {
+      ' Need to discuss drone specific attributes
+    }
+
+    class StaticManager <<abstract>> Extends AgentManager {
+      -location: carla.Location
+      +get_location()
+    }
+
+    class RSUManager Extends StaticManager  {
+    }
+
+    ' Define inheritance relationships
+    SimScenario o-- AgentManager
+    SimScenario *-- DataLogger : owns
+
+    DataLogger ..> VehicleManager : save
+    DataLogger ..> DroneManager : save
+    DataLogger ..> RSUManager : save
+
+}
+
+package skylink_v2x.core.v2x_manager {
+  class V2XManager {
+    +cda_enabled
+    +communication_range
+    +cav_nearby
+    +received_buffer
+    +platooning_plugin
+    +cav_world
+    +ego_pos
+    +ego_spd
+    +ego_dynamic_trace
+    +vid
+    +loc_noise
+    +yaw_noise
+    +speed_noise
+    +lag
+  }
+}
+
+package skylink_v2x.skylink_v2x_carla {
+  class Transform {
+  }
+  class Location {
+  }
+  class Rotation {
+    +pitch: float
+    +yaw: float
+    +roll: float
+  }
+  class Vector3D {
+    +x
+    +y
+    +z
+  }
+}
+
+package skylink_v2x.scenario_manager {
+  package evaluations.evaluate_manager {
+    class EvaluationManager {
+      +cav_world
+      +fixed_delta_seconds
+      +skip_head
+      +eval_save_path
+    }
+  }
+  package utils.cosim_api {
+    class CoScenarioManager {
+      +_active_actors
+      +spawned_actors
+      +destroyed_actors
+      +_tls
+      +sumo
+      +sumo2carla_ids
+      +carla2sumo_ids
+    }
+  }
+  package utils.sim_api {
+    class ScenarioManager {
+      +scenario_params
+      +carla_version
+      +client
+      +world
+      +origin_settings
+      +use_multi_class_bp
+      +bp_meta
+      +bp_class_sample_prob
+      +cav_world
+      +carla_map
+      +apply_ml
+    }
+  }
+}
+
+'''''''''''''''''
+' Relationships '
+'''''''''''''''''
+
+' others 
+skylink_v2x.skylink_v2x_carla.Transform <|-- skylink_v2x.skylink_v2x_carla.Location
+skylink_v2x.skylink_v2x_carla.Vector3D <|-- skylink_v2x.skylink_v2x_carla.Location
+skylink_v2x.scenario_manager.utils.sim_api.ScenarioManager <|-- skylink_v2x.scenario_manager.utils.cosim_api.CoScenarioManager
+
+' skylink_v2x.core.agent_stack
+' skylink_v2x.core.agent_stack.RSUManager *-- skylink_v2x.core.autonomy_stack.localization.rsu_localization_manager.LocalizationManager
+skylink_v2x.core.agent_stack.RSUManager *-- skylink_v2x.core.autonomy_stack.perception.perception_manager.PerceptionManager
+
+' skylink_v2x.scenario_manager
+skylink_v2x.scenario_manager.utils.cosim_api.CoScenarioManager --> skylink_v2x.co_simulation.simulation_manager.CoSimulationManager
+skylink_v2x.scenario_manager.utils.sim_api.ScenarioManager --> skylink_v2x.core.agent_stack.SimScenario
+skylink_v2x.scenario_manager.utils.cosim_api.CoScenarioManager *-- skylink_v2x.co_simulation.sumo_integration.sumo_simulation.SumoSimulation
+
+' skylink_v2x.core.v2x_manager.V2XManager
+' skylink_v2x.core.v2x_manager.V2XManager o-- skylink_v2x.core.agent_stack.SimScenario
+skylink_v2x.core.v2x_manager.V2XManager o-- skylink_v2x.core.agent_stack.AgentManager
+skylink_v2x.core.v2x_manager.V2XManager o-- skylink_v2x.core.autonomy_stack.mapping.MappingManager
+skylink_v2x.core.v2x_manager.V2XManager o-- skylink_v2x.core.autonomy_stack.safety.safety_manager.SafetyManager
+skylink_v2x.core.v2x_manager.V2XManager o-- skylink_v2x.core.autonomy_stack.perception.perception_manager.PerceptionManager
+skylink_v2x.core.v2x_manager.V2XManager o-- skylink_v2x.core.autonomy_stack.control.control_manager.ControlManager
+skylink_v2x.core.v2x_manager.V2XManager o-- skylink_v2x.core.autonomy_stack.localization.localization_manager.LocalizationManager
+skylink_v2x.core.v2x_manager.V2XManager o-- skylink_v2x.core.autonomy_stack.planning.planning_manager.PlanningManager
+
+@enduml

@@ -1,0 +1,33 @@
+package opencda.core.mapping {
+  abstract class MappingManager {
+    +world
+    +agent_id
+    +carla_map
+    +center
+    +activate
+    +visualize
+    +pixels_per_meter
+    +meter_per_pixel
+    +raster_size
+    +lane_sample_resolution
+    +raster_radius
+    +topology
+    +lane_info
+    +crosswalk_info
+    +traffic_light_info
+    +bound_info
+    +dynamic_bev
+    +static_bev
+    +vis_bev
+  }
+
+  class VehicleMappingManager Extends MappingManager {
+  }
+
+  class DroneMappingManager Extends MappingManager {
+  }
+
+  class RSUMappingManager Extends MappingManager {
+  }
+
+}

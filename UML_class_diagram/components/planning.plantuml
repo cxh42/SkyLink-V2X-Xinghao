@@ -1,0 +1,161 @@
+package opencda.core.planning {
+  package planning_manager {
+    abstract class PlanningManager {
+      +vehicle
+      +_ego_pos
+      +_ego_speed
+      +_map
+      +max_speed
+      +tailgate_speed
+      +speed_lim_dist
+      +speed_decrease
+      +safety_time
+      +emergency_param
+      +break_distance
+      +ttc
+      +_collision_check
+      +ignore_traffic_light
+      +overtake_allowed
+      +overtake_allowed_origin
+      +overtake_counter
+      +hazard_flag
+      +_global_planner
+      +start_waypoint
+      +end_waypoint
+      +_sampling_resolution
+      +light_state
+      +light_id_to_ignore
+      +stop_sign_wait_count
+      +_local_planner
+      +car_following_flag
+      +lane_change_allowed
+      +destination_push_flag
+      +white_list
+      +dynamic_obstacles
+      +objects
+      +debug_helper
+      +debug
+      +initial_global_route
+    }
+
+    class VehiclePlanningManager Extends PlanningManager {
+    }
+
+    class DronePlanningManager Extends PlanningManager {
+    }
+
+    class RSUPlanningManager Extends PlanningManager {
+
+    }
+
+  }
+
+  planning_manager.PlanningManager *-- behavior_agent.BehaviorAgent
+
+  package planer_debug_helper {
+    class PlanDebugHelper {
+      +actor_id
+      +speed_list
+      +acc_list
+      +ttc_list
+      +count
+    }
+  }
+
+  behavior_agent.BehaviorAgent *-- planer_debug_helper.PlanDebugHelper
+
+  package collision_check {
+    class CollisionChecker {
+      +time_ahead
+      +_circle_offsets
+      +_circle_radius
+    }
+  }
+
+  behavior_agent.BehaviorAgent *-- collision_check.CollisionChecker
+
+  package global_route_planner {
+    class GlobalRoutePlanner {
+      +_dao
+      +_topology
+      +_graph
+      +_id_map
+      +_road_id_to_edge
+      +_intersection_end_node
+      +_previous_decision
+    }
+
+    enum RoadOption {
+      VOID
+      LEFT
+      RIGHT
+      STRAIGHT
+      LANEFOLLOW
+      CHANGELANELEFT
+      CHANGELANERIGHT
+    }
+
+    GlobalRoutePlanner *-- RoadOption
+  }
+
+  behavior_agent.BehaviorAgent *-- global_route_planner.GlobalRoutePlanner
+
+  package global_route_planner_dao {
+    class GlobalRoutePlannerDAO {
+      +_sampling_resolution
+      +_wmap
+    }
+  }
+
+  behavior_agent.BehaviorAgent *-- global_route_planner_dao.GlobalRoutePlannerDAO
+
+  package local_planner_behavior {
+    class LocalPlanner {
+      +_vehicle
+      +_map
+      +_ego_pos
+      +_ego_speed
+      +_min_distance
+      +_buffer_size
+      +waypoints_queue
+      +_waypoint_buffer
+      +_long_plan_debug
+      +_trajectory_buffer
+      +_history_buffer
+      +trajectory_update_freq
+      +waypoint_update_freq
+      +dt
+      +potential_curved_road
+      +lane_id_change
+      +lane_lateral_change
+      +debug
+      +debug_trajectory
+    }
+  }
+
+  behavior_agent.BehaviorAgent *-- local_planner_behavior.LocalPlanner
+
+  package spline {
+    class Spline2D {
+      +s
+      +sx
+      +sy
+    }
+    class Spline {
+      +b
+      +c
+      +d
+      +w
+      +x
+      +y
+      +nx
+      +a
+      +c
+    }
+    Spline2D *-- Spline
+  }
+
+  local_planner_behavior.LocalPlanner *-- spline.Spline2D
+
+
+}

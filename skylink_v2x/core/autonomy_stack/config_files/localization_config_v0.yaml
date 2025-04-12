@@ -1,0 +1,45 @@
+sensors:
+  camera:
+    - {
+        name: "front_camera",
+        fov: 90.0,
+        resolution: [1280, 720], # [image_size_x, image_size_y]
+        pos: [0.0, 0.0, 0.0],
+        rot: [0.0, 0.0, 0.0], # roll, yaw, pitch
+      }
+    - {
+        name: "left_camera",
+        fov: 90.0,
+        resolution: [1280, 720],
+        pos: [0.0, 0.0, 0.0],
+        rot: [0.0, 0.0, 0.0], # roll, yaw, pitch
+      }
+    - {
+        name: "right_camera",
+        fov: 90.0,
+        resolution: [1280, 720],
+        pos: [0.0, 0.0, 0.0],
+        rot: [0.0, 0.0, 0.0], # roll, yaw, pitch
+      }
+    - {
+        name: "rear_camera",
+        fov: 90.0,
+        resolution: [1280, 720],
+        pos: [0.0, 0.0, 0.0],
+        rot: [0.0, 0.0, 0.0], # roll, yaw, pitch
+      }
+  lidar:
+    - {
+        name: "lidar",
+        pos: [0.0, 0.0, 0.0],
+        rot: [0.0, 0.0, 0.0], # roll, yaw, pitch
+      }
+  semantic_lidar:
+    - {
+        name: "semantic_lidar",
+        pos: [0.0, 0.0, 0.0],
+        rot: [0.0, 0.0, 0.0], # roll, yaw, pitch
+      }
+detection: "gt"
+detection_model_config: None
+

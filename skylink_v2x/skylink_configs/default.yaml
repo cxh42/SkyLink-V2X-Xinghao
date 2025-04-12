@@ -1,0 +1,94 @@
+description: |-
+  Copyright 2021 <UCLA Mobility Lab>
+  Author: Runsheng Xu <rxx3386@ucla.edu>
+  Content: This is the template scenario testing configuration file that other scenarios could directly refer
+
+# define carla simulation setting
+world:
+  sync_mode: true
+  client_port: 2000
+  fixed_delta_seconds: 0.05
+  seed: 11 # seed for numpy and random
+  weather:
+    sun_altitude_angle: 15 # 90 is the midday and -90 is the midnight
+    cloudiness: 0 # 0 is the clean sky and 100 is the thickest cloud
+    precipitation: 0 # rain, 100 is the heaviest rain
+    precipitation_deposits: 0 # Determines the creation of puddles. Values range from 0 to 100, being 0 none at all and 100 a road completely capped with water.
+    wind_intensity: 0 # it will influence the rain
+    fog_density: 0 # fog thickness, 100 is the largest
+    fog_distance: 0  # Fog start distance. Values range from 0 to infinite.
+    fog_falloff: 0 # Density of the fog (as in specific mass) from 0 to infinity. The bigger the value, the more dense and heavy it will be, and the fog will reach smaller heights
+    wetness: 0
+
+
+communication:
+  data_logger:
+    data_path: /home/xh/视频/skylink_ouput
+
+# Basic parameters of the vehicles
+agent_base:
+  vehicle:
+    autonomy_option: carla # options: carla, rule_based
+    perception:
+      base: skylink_v2x/core/autonomy_stack/config_files/perception/vehicle_base.yaml
+    localization:
+      base: skylink_v2x/core/autonomy_stack/config_files/localization/vehicle_base.yaml
+    mapping:
+      base: skylink_v2x/core/autonomy_stack/config_files/mapping/vehicle_base.yaml
+    planning:
+      base: skylink_v2x/core/autonomy_stack/config_files/planning/vehicle_base.yaml
+    control:
+      base: skylink_v2x/core/autonomy_stack/config_files/control/vehicle_base.yaml
+    v2x:
+      communication_range: 200
+
+  drone:
+    perception:
+      base: skylink_v2x/core/autonomy_stack/config_files/perception/drone_base.yaml
+    localization:
+      base: skylink_v2x/core/autonomy_stack/config_files/localization/drone_base.yaml
+    mapping:
+      base: skylink_v2x/core/autonomy_stack/config_files/mapping/drone_base.yaml
+    planning:
+      base: skylink_v2x/core/autonomy_stack/config_files/planning/drone_base.yaml
+    control:
+      base: skylink_v2x/core/autonomy_stack/config_files/control/drone_base.yaml
+    v2x:
+      communication_range: 200
+
+  rsu:
+    perception:
+      base: skylink_v2x/core/autonomy_stack/config_files/perception/rsu_base.yaml
+    localization:
+      base: skylink_v2x/core/autonomy_stack/config_files/localization/rsu_base.yaml
+    mapping:
+      base: skylink_v2x/core/autonomy_stack/config_files/mapping/rsu_base.yaml
+    planning:
+      base: skylink_v2x/core/autonomy_stack/config_files/planning/rsu_base.yaml
+    control:
+      base: skylink_v2x/core/autonomy_stack/config_files/control/rsu_base.yaml
+    v2x:
+      communication_range: 200
+      
+
+
+# define the background traffic control by carla
+carla_traffic_manager:
+  sync_mode: true # has to be same as the world setting
+  global_distance: 5 # the minimum distance in meters that vehicles have to keep with the rest
+  # Sets the difference the vehicle's intended speed and its current speed limit.
+  #  Carla default speed is 30 km/h, so -100 represents 60 km/h,
+  # and 20 represents 24 km/h
+  global_speed_perc: -100
+  set_osm_mode: true # Enables or disables the OSM mode.
+  auto_lane_change: false
+  ignore_lights_percentage: 0 # whether set the traffic ignore traffic lights
+  random: false # whether to random select vehicles' color and model
+  vehicle_list: []  # define in each scenario. If set to ~, then the vehicles be spawned in a certain range
+  # Used only when vehicle_list is ~
+  # x_min, x_max, y_min, y_max, x_step, y_step, vehicle_num
+  range: []
+
+# define tne scenario in each specific scenario
+scenario:
+  single_cav_list: []

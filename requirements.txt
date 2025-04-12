@@ -1,0 +1,9 @@
+omegaconf
+opencv-python
+open3d
+pyyaml
+scipy
+matplotlib
+networkx
+shapely
+carla

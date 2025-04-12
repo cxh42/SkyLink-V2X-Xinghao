@@ -1,0 +1,63 @@
+package opencda.core.safety {
+  package safety_manager {
+    abstract class SafetyManager {
+      +vehicle
+      +cav_world
+      +print_message
+      +imu_sensor
+      +status_queue
+      +sensors
+    }
+
+    class VehicleSafetyManager Extends SafetyManager {
+    }
+
+    class DroneSafetyManager Extends SafetyManager {
+    }
+
+    class RSUSafetyManager Extends SafetyManager {
+    }
+  }
+
+  package safety_sensors {
+    class CollisionSensor {
+      +sensor
+      +collided
+      +collided_frame
+      +_history
+      +_threshold
+    }
+    class IMUSensor {
+      +sensor
+      +imu_data
+      +vehicle
+    }
+    class OffRoadDetector {
+      +off_road
+    }
+    class StuckDetector {
+      +_speed_queue
+      +_len_thresh
+      +_speed_thresh
+      +stuck
+    }
+    class TrafficLightDector {
+      +ran_light
+      +_map
+      +veh_extent
+      +_light_dis_thresh
+      +_active_light
+      +_last_light
+      +total_lights_ran
+      +total_lights
+      +ran_light
+      +active_light_state
+      +active_light_dis
+    }
+  }
+  safety_manager.SafetyManager *-- safety_sensors.CollisionSensor
+  safety_manager.SafetyManager *-- safety_sensors.IMUSensor
+  safety_manager.SafetyManager *-- safety_sensors.OffRoadDetector
+  safety_manager.SafetyManager *-- safety_sensors.StuckDetector
+  safety_manager.SafetyManager *-- safety_sensors.TrafficLightDector
+}

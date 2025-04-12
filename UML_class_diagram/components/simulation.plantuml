@@ -1,0 +1,116 @@
+package skylink_v2x.autonomy_stack.co_simulation {
+	package simulation_engine {
+		abstract class SimulationEngine {
+			+initialize()
+			+step()
+			+shutdown()
+		}
+		
+		class CarlaSimulation extends SimulationEngine {
+			+client
+			+world
+			+blueprint_library
+			+step_length
+			+activeActors
+			+spawnedActors
+			+destroyedActors
+		}
+		
+		class AirSimSimulation extends SimulationEngine {
+			+client
+			+world
+			+droneAPI
+			+step_length
+			+activeActors
+			+spawnedActors
+			+destroyedActors
+		}
+	}
+	package simulation_manager {
+		class CoSimulationManager {
+			-carlaSim: skylink_v2x.autonomy_stack.co_simulation.simulation_engine.CarlaSimulation
+			-airsimSim: skylink_v2x.autonomy_stack.co_simulation.simulation_engine.AirSimSimulation
+			+initializeSimulations()
+			+stepSimulations()
+			+shutdownSimulations()
+			+getMap() : skylink_v2x.autonomy_stack.core.mapping.map_manager.MapManager
+		}
+	}
+	simulation_manager.CoSimulationManager *-- simulation_engine.AirSimSimulation
+	simulation_manager.CoSimulationManager *-- simulation_engine.CarlaSimulation
+
+
+	package sumo_integration {
+		package bridge_helper {
+			class BridgeHelper {
+			+dir_path
+			+blueprint_library
+			+offset
+			+data_json
+			+_VTYPES
+			}
+		}
+		package sumo_simulation {
+			class SumoSignalState {
+			}
+			class SumoVehSignal {
+			}
+			class SumoActor {
+			+type_id: Any
+			+vclass: Any
+			+transform: Any
+			+signals: Any
+			+extent: Any
+			+color: Any
+			}
+			enum SumoActorClass {
+			IGNORING
+			PRIVATE
+			EMERGENCY
+			AUTHORITY
+			ARMY
+			VIP
+			PEDESTRIAN
+			PASSENGER
+			HOV
+			TAXI
+			BUS
+			COACH
+			DELIVERY
+			TRUCK
+			TRAILER
+			MOTORCYCLE
+			MOPED
+			BICYCLE
+			EVEHICLE
+			TRAM
+			RAIL_URBAN
+			RAIL
+			RAIL_ELECTRIC
+			RAIL_FAST
+			SHIP
+			CUSTOM1
+			CUSTOM2
+			}
+			class SumoSimulation {
+			+net
+			+_sequential_id
+			+spawned_actors
+			+destroyed_actors
+			+traffic_light_manager
+			}
+			class SumoTLLogic {
+			+tlid
+			+states
+			+_landmark2link
+			+_link2landmark
+			}
+			class SumoTLManager {
+			+_tls
+			+_current_program
+			+_current_phase
+			+_off
+			}
+		}
+	}
+}

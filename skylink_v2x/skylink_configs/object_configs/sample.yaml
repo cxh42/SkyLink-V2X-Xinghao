@@ -1,0 +1,103 @@
+class_idx:
+  0:
+    name: pedestrian
+    motion_type: dynamic
+    blueprints:
+    - walker.pedestrian.*
+  1:
+    name: bicycle
+    motion_type: dynamic
+    blueprints:
+      - vehicle.diamondback.century
+      - vehicle.gazelle.omafiets
+      - vehicle.bh.crossbike
+  2:
+    name: motorcycle
+    motion_type: dynamic
+    blueprints:
+      - vehicle.vespa.zx125
+      - vehicle.kawasaki.ninja
+      - vehicle.harley-davidson.low_rider
+      - vehicle.yamaha.yzf
+  3:
+    name: car
+    motion_type: dynamic
+    blueprints:
+      - vehicle.dodge.charger_2020
+      - vehicle.dodge.charger_police
+      - vehicle.dodge.charger_police_2020
+      - vehicle.ford.crown
+      - vehicle.ford.mustang
+      - vehicle.lincoln.mkz_2020
+      - vehicle.lincoln.mkz_2017
+      - vehicle.mercedes.coupe_2020
+      - vehicle.mercedes.coupe
+      - vehicle.mini.cooper_s_2021
+      - vehicle.mini.cooper_s
+      - vehicle.nissan.patrol_2021
+      - vehicle.nissan.patrol
+      - vehicle.nissan.micra
+      - vehicle.tesla.model3
+      - vehicle.audi.etron
+      - vehicle.audi.tt
+      - vehicle.audi.a2
+      - vehicle.toyota.prius
+      - vehicle.seat.leon
+      - vehicle.chevrolet.impala
+      - vehicle.micro.microlino
+      - vehicle.bmw.grandtourer
+      - vehicle.citroen.c3
+      - vehicle.jeep.wrangler_rubicon
+  4:
+    name: van
+    motion_type: dynamic
+    blueprints:
+      - vehicle.volkswagen.t2_2021
+      - vehicle.volkswagen.t2
+      - vehicle.mercedes.sprinter
+      - vehicle.ford.ambulance
+  5:
+    name: truck
+    motion_type: dynamic
+    blueprints:
+      - vehicle.carlamotors.european_hgv
+      - vehicle.carlamotors.firetruck
+      - vehicle.tesla.cybertruck
+      - vehicle.carlamotors.carlacola
+  6:
+    name: bus
+    motion_type: dynamic
+    blueprints:
+      - vehicle.mitsubishi.fusorosa
+  7:
+    name: other
+    motion_type: dynamic
+    blueprints:
+      - static.prop.*
+  8:
+    name: traffic_light
+    motion_type: static
+    blueprints:
+      - traffic.traffic_light.*
+  9:
+    name: traffic_sign
+    motion_type: static
+    blueprints:
+      - traffic.speed_limit.*
+      - traffic.stop.*
+      - traffic.yield.*
+      - traffic.*.stop
+      - traffic.*.yield
+      - traffic.*.limit
+  10:
+    name: traffic_cone
+    motion_type: static
+    blueprints:
+      - static.prop.trafficcone.*
+
+vehicle_types:
+  - car
+  - van
+  - truck
+  - bus
+
