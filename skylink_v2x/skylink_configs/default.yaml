@@ -23,7 +23,7 @@ world:
 
 communication:
   data_logger:
-    data_path: /home/xh/视频/skylink_ouput
+    data_path: /home/xh/projects/outputs
 
 # Basic parameters of the vehicles
 agent_base:
