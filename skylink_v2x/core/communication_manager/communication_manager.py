@@ -274,7 +274,6 @@ class CommunicationManager:
                 
             history_data = self._comm_agent_helpers[agent_id].get_perception_data()
             
-            # 安全检查：确保历史数据非空
             if not history_data or len(history_data) == 0:
                 data_dict[agent_id] = None
                 continue

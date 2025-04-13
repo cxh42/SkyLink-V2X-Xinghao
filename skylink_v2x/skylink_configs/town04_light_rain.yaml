@@ -1,0 +1,181 @@
+# Town04 轻度降雨
+
+description: |-
+  Town04轻度降雨场景 - 包含车辆、无人机和路侧单元
+
+world:
+  town: Town04
+  # 轻度降雨天气设置
+  weather:
+    sun_altitude_angle: 45     # 中等太阳高度
+    cloudiness: 70             # 较多云量
+    precipitation: 35          # 轻度降雨
+    precipitation_deposits: 25  # 少量积水
+    wind_intensity: 20         # 轻到中等风力
+    fog_density: 5             # 轻微雾气
+    fog_distance: 0
+    fog_falloff: 0
+    wetness: 50                # 中等湿度
+
+scenario_name: town04_light_rain
+
+carla_traffic_manager:
+  auto_lane_change: true
+  global_distance: 5
+  global_speed_perc: 20
+  ignore_lights_percentage: 0
+  random: true
+  range:
+    - [189.1, 417.3, -253.7, -43.4, 3.5, 3.5, 70] # [xmin, xmax, ymin, ymax, zmin, zmax, num_of_vehicles]
+  set_osm_mode: true
+  sync_mode: true
+  vehicle_list: null
+
+scenario:
+  agent_list:
+    # 车辆
+    - destination: [412.3, -48.4, 0.3] # 车辆目的地 [x, y, z]
+      name: cav1 # 第一辆车
+      type: vehicle
+      spawn_position: [202.8, -199.0, 0.3] # 车辆生成位置 [x, y, z]
+      v2x:
+        communication_range: 200
+      idx: 0
+
+    - destination: [408.8, -50.2, 0.3]
+      name: cav2
+      type: vehicle
+      spawn_position: [200.0, -230.7, 0.35]
+      v2x:
+        communication_range: 200
+      idx: 1
+
+    - destination: [391.5, -66.3, 0.3]
+      name: cav3
+      type: vehicle
+      spawn_position: [194.1, -248.7, 1.0]
+      v2x:
+        communication_range: 200
+      idx: 2
+
+    - destination: [384.5, -66.4, 0.3]
+      name: cav4
+      type: vehicle
+      spawn_position: [199.5, -210.4, 1.0]
+      v2x:
+        communication_range: 200
+      idx: 3
+
+    - destination: [391.6, -90.0, 0.3]
+      name: cav5
+      type: vehicle
+      spawn_position: [211.3, -245.9, 1.0]
+      v2x:
+        communication_range: 200
+      idx: 4
+
+    # 无人机
+    - spawn_position: [202.8, -199.0, 70, 0, -90, 0] # 无人机生成位置 [x, y, z, pitch, yaw, roll]
+      attached_vehicle: 'cav1'
+      name: UAV1
+      type: drone
+      planning_config:
+        mode: escort # escort(跟随), hover(悬停), patrol(巡逻)
+        height: 70
+        patrol_points:
+          - [202.8, -199.0, 70]
+          - [300.0, -120.0, 70]
+          - [390.0, -60.0, 70]
+        patrol_radius: 10
+      idx: 5
+      v2x:
+        communication_range: 500
+
+    - spawn_position: [200.0, -230.7, 65, 0, -90, 0]
+      attached_vehicle: 'cav2'
+      name: UAV2
+      type: drone
+      planning_config:
+        mode: escort
+        height: 65
+        patrol_points:
+          - [200.0, -230.7, 65]
+          - [300.0, -130.0, 65]
+        patrol_radius: 10
+      idx: 6
+      v2x:
+        communication_range: 500
+
+    - spawn_position: [194.1, -248.7, 75, 0, 180, 0]
+      attached_vehicle: 'cav3'
+      name: UAV3
+      type: drone
+      planning_config:
+        mode: escort
+        height: 75
+        patrol_points:
+          - [194.1, -248.7, 75]
+          - [290.0, -150.0, 75]
+        patrol_radius: 10
+      idx: 7
+      v2x:
+        communication_range: 500
+
+    - spawn_position: [199.5, -210.4, 70, 0, 180, 0]
+      attached_vehicle: 'cav4'
+      name: UAV4
+      type: drone
+      planning_config:
+        mode: escort
+        height: 70
+        patrol_points:
+          - [199.5, -210.4, 70]
+          - [290.0, -140.0, 70]
+        patrol_radius: 10
+      idx: 8
+      v2x:
+        communication_range: 500
+
+    - spawn_position: [211.3, -245.9, 80, 0, 180, 0]
+      attached_vehicle: 'cav5'
+      name: UAV5
+      type: drone
+      planning_config:
+        mode: escort 
+        height: 80
+        patrol_points:
+          - [211.3, -245.9, 80]
+          - [300.0, -160.0, 80]
+        patrol_radius: 10
+      idx: 9
+      v2x:
+        communication_range: 500
+
+    # 路侧单元    
+    - name: RSU1
+      type: rsu
+      spawn_position: [343.5, -178.2, 0.3]
+      idx: 10
+      v2x:
+        communication_range: 500
+
+    - name: RSU2
+      type: rsu
+      spawn_position: [249.6, -128.2, 0.3]
+      idx: 11
+      v2x:
+        communication_range: 500
+
+    - name: RSU3
+      type: rsu
+      spawn_position: [319.9, -127.2, 0.3]
+      idx: 12
+      v2x:
+        communication_range: 500
+        
+    - name: RSU4
+      type: rsu
+      spawn_position: [191.6, -253.1, 0.3]
+      idx: 13
+      v2x:
+        communication_range: 500

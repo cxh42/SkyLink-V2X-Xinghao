@@ -1,0 +1,167 @@
+# Town10HD 多云天气
+
+description: |-
+  Town10HD多云天气场景 - 包含车辆、无人机和路侧单元
+
+world:
+  town: Town10HD
+  # 多云天气设置
+  weather:
+    sun_altitude_angle: 55      # 较高太阳位置
+    cloudiness: 75              # 大量云层
+    precipitation: 0            # 无雨
+    precipitation_deposits: 0    # 无积水
+    wind_intensity: 15          # 中等风力
+    fog_density: 0              # 无雾
+    fog_distance: 0
+    fog_falloff: 0
+    wetness: 0                  # 干燥
+
+scenario_name: town10hd_cloudy
+
+carla_traffic_manager:
+  auto_lane_change: true
+  global_distance: 5
+  global_speed_perc: 20
+  ignore_lights_percentage: 0
+  random: true
+  range:
+    - [-118.6, 114.5, -30.8, 97.8, 3.5, 3.5, 60] # [xmin, xmax, ymin, ymax, zmin, zmax, num_of_vehicles]
+  set_osm_mode: true
+  sync_mode: true
+  vehicle_list: null
+
+scenario:
+  agent_list:
+    # 车辆
+    - destination: [-113.4, -25.8, 0.3] # 车辆目的地 [x, y, z]
+      name: cav1 # 第一辆车
+      type: vehicle
+      spawn_position: [98.8, 82.9, 0.3] # 车辆生成位置 [x, y, z]
+      v2x:
+        communication_range: 200
+      idx: 0
+
+    - destination: [-113.6, -14.3, 0.3]
+      name: cav2
+      type: vehicle
+      spawn_position: [106.0, 92.8, 0.35]
+      v2x:
+        communication_range: 200
+      idx: 1
+
+    - destination: [-106.6, -17.1, 0.3]
+      name: cav3
+      type: vehicle
+      spawn_position: [109.5, 89.8, 1.0]
+      v2x:
+        communication_range: 200
+      idx: 2
+
+    - destination: [-103.2, -14.4, 0.3]
+      name: cav4
+      type: vehicle
+      spawn_position: [106.0, 67.4, 1.0]
+      v2x:
+        communication_range: 200
+      idx: 3
+
+    - destination: [-103.2, -2.2, 0.3]
+      name: cav5
+      type: vehicle
+      spawn_position: [102.3, 80.4, 1.0]
+      v2x:
+        communication_range: 200
+      idx: 4
+
+    # 无人机
+    - spawn_position: [98.8, 82.9, 70, 0, -90, 0] # 无人机生成位置 [x, y, z, pitch, yaw, roll]
+      attached_vehicle: 'cav1'
+      name: UAV1
+      type: drone
+      planning_config:
+        mode: escort # escort(跟随), hover(悬停), patrol(巡逻)
+        height: 70
+        patrol_points:
+          - [98.8, 82.9, 70]
+          - [0.0, 30.0, 70]
+          - [-100.0, -20.0, 70]
+        patrol_radius: 10
+      idx: 5
+      v2x:
+        communication_range: 500
+
+    - spawn_position: [106.0, 92.8, 65, 0, -90, 0]
+      attached_vehicle: 'cav2'
+      name: UAV2
+      type: drone
+      planning_config:
+        mode: escort
+        height: 65
+        patrol_points:
+          - [106.0, 92.8, 65]
+          - [0.0, 40.0, 65]
+        patrol_radius: 10
+      idx: 6
+      v2x:
+        communication_range: 500
+
+    - spawn_position: [109.5, 89.8, 75, 0, 180, 0]
+      attached_vehicle: 'cav3'
+      name: UAV3
+      type: drone
+      planning_config:
+        mode: escort
+        height: 75
+        patrol_points:
+          - [109.5, 89.8, 75]
+          - [0.0, 35.0, 75]
+        patrol_radius: 10
+      idx: 7
+      v2x:
+        communication_range: 500
+
+    - spawn_position: [106.0, 67.4, 70, 0, 180, 0]
+      attached_vehicle: 'cav4'
+      name: UAV4
+      type: drone
+      planning_config:
+        mode: escort
+        height: 70
+        patrol_points:
+          - [106.0, 67.4, 70]
+          - [0.0, 25.0, 70]
+        patrol_radius: 10
+      idx: 8
+      v2x:
+        communication_range: 500
+
+    - spawn_position: [102.3, 80.4, 80, 0, 180, 0]
+      attached_vehicle: 'cav5'
+      name: UAV5
+      type: drone
+      planning_config:
+        mode: escort 
+        height: 80
+        patrol_points:
+          - [102.3, 80.4, 80]
+          - [0.0, 35.0, 80]
+        patrol_radius: 10
+      idx: 9
+      v2x:
+        communication_range: 500
+
+    # 路侧单元    
+    - name: RSU1
+      type: rsu
+      spawn_position: [-62.4, 20.2, 0.3]
+      idx: 10
+      v2x:
+        communication_range: 500
+
+    - name: RSU2
+      type: rsu
+      spawn_position: [114.5, 21.2, 0.3]
+      idx: 11
+      v2x:
+        communication_range: 500
